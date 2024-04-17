@@ -16,12 +16,12 @@ pip install PyPDF2
 Run the script with the paths to the input and output PDF files:
 
 ```bash
-python3 grnvs_slide_handout_creator.py <input_pdf_path> <output_pdf_path>
+python3 grnvsHandout.py <input_pdf_path> <output_pdf_path>
 ```
 
 ## Example
 To process slides.pdf and output the handout to handout.pdf:
 
 ```bash
-python3 grnvs_slide_handout_creator.py slides.pdf handout.pdf
+python3 grnvsHandout.py slides.pdf handout.pdf
 ```
