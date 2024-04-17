@@ -9,7 +9,7 @@ This Python script generates handouts from GRNVS (Grundlagen: Rechnernetze und V
 Install the PyPDF2 package using pip:
 
 ```bash
-pip install PyPDF2
+pip3 install PyPDF2
 ```
 
 ## Usage
