@@ -3,8 +3,8 @@ import re
 import argparse
 
 def process_pdf(input_pdf_path, output_pdf_path):
-    reader = PyPDF2.PdfFileReader(input_pdf_path)
-    writer = PyPDF2.PdfFileWriter()
+    reader = PyPDF2.PdfReader(input_pdf_path)
+    writer = PyPDF2.PdfWriter()
 
     first_page = reader.pages[0]
     writer.add_page(first_page)
@@ -13,6 +13,8 @@ def process_pdf(input_pdf_path, output_pdf_path):
 
     print("Scanning pages for page numbers...")
 
+    last_page_number = 0
+
     for i in range(1, len(reader.pages)):
         page = reader.pages[i]
         text = page.extract_text()
@@ -20,6 +22,10 @@ def process_pdf(input_pdf_path, output_pdf_path):
 
         if page_number is not None:
             page_number_dict[page_number] = page
+            last_page_number = page_number
+        else:
+            page_number_dict[last_page_number+1] = page
+            last_page_number += 1
 
         if i < len(reader.pages) - 1:
             print(f"{progress_bar(i, len(reader.pages))} {i}/{len(reader.pages)}", end='\r')
