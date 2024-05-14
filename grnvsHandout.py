@@ -1,58 +1,47 @@
-import PyPDF2
+import fitz
 import re
 import argparse
 
 def process_pdf(input_pdf_path, output_pdf_path):
-    reader = PyPDF2.PdfReader(input_pdf_path)
-    writer = PyPDF2.PdfWriter()
-
-    first_page = reader.pages[0]
-    writer.add_page(first_page)
+    doc = fitz.open(input_pdf_path)
+    out = fitz.open()
 
     page_number_dict = {}
 
     print("Scanning pages for page numbers...")
-
-    last_page_number = 0
-
-    for i in range(1, len(reader.pages)):
-        page = reader.pages[i]
-        text = page.extract_text()
+    next_page_number = 0
+    for i, page in enumerate(doc):
+        text = page.get_text()
         page_number = parse_page_number(text)
-
         if page_number is not None:
-            page_number_dict[page_number] = page
-            last_page_number = page_number
+            page_number_dict[page_number] = i
+            next_page_number = page_number + 1
         else:
-            page_number_dict[last_page_number+1] = page
-            last_page_number += 1
+            page_number_dict[next_page_number] = i
+            next_page_number += 1
 
-        if i < len(reader.pages) - 1:
-            print(f"{progress_bar(i, len(reader.pages))} {i}/{len(reader.pages)}", end='\r')
+        if i < doc.page_count - 1:
+            print(f"{progress_bar(i+1, doc.page_count)} {i+1}/{doc.page_count}", end='\r')
         else:
-            print(f"{progress_bar(i, len(reader.pages))} {i}/{len(reader.pages)}")
+            print(f"{progress_bar(i+1, doc.page_count)} {i+1}/{doc.page_count}")
 
     print("Creating handout...")
     final_num_of_pages = len(page_number_dict)
-    pages_added = 0
-    for page_number in sorted(page_number_dict.keys()):
-
-        writer.add_page(page_number_dict[page_number])
-        pages_added += 1
-        if pages_added < final_num_of_pages:
-            print(f"{progress_bar(pages_added, final_num_of_pages)} {pages_added}/{final_num_of_pages}", end='\r')
+    for i, page_number in enumerate(sorted(page_number_dict.keys())):
+        out.insert_pdf(doc, from_page=page_number_dict[page_number], to_page=page_number_dict[page_number])
+        if i < final_num_of_pages - 1:
+            print(f"{progress_bar(i+1, final_num_of_pages)} {i+1}/{final_num_of_pages}", end='\r')
         else:
-            print(f"{progress_bar(pages_added, final_num_of_pages)} {pages_added}/{final_num_of_pages}")
+            print(f"{progress_bar(i+1, final_num_of_pages)} {i+1}/{final_num_of_pages}")
 
     print("Writing handout to file...")
-
-    with open(output_pdf_path, 'wb') as f:
-        writer.write(f)
-
+    out.save(output_pdf_path)
+    out.close()
+    doc.close()
     print("Done!")
 
 def parse_page_number(text):
-    match = re.search(r'Kapitel.*?(\d+-\d+)$', text)
+    match = re.search(r'Kapitel.*?(\d+-\d+)', text, re.DOTALL)
     if match:
         return int(match.group().split('-')[-1])
     return None

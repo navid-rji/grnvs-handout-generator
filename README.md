@@ -1,15 +1,15 @@
 # GRNVS Slide Handout Creator
-This Python script generates handouts from GRNVS (Grundlagen: Rechnernetze und Verteilte Systeme) course slides by consolidating multiple slides for the same page number into just the last slide of each number. This simplifies the material for easier study.
+This Python script generates handouts from GRNVS (Grundlagen: Rechnernetze und Verteilte Systeme) course slides by condensing multiple slides for the same page number into just the last slide of each number. This simplifies the material for easier study.
 
 ## Requirements
 - Python 3.x
-- PyPDF2 library
+- PyMuPDF library
 
 ## Installation
 Install the PyPDF2 package using pip:
 
 ```bash
-pip3 install PyPDF2
+pip3 install PyMuPDF
 ```
 
 ## Usage
